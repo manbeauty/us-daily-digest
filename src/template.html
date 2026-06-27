@@ -4,361 +4,275 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🇺🇸 美国每日资讯日报 - {{update_date}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         :root {
-            --primary: #1a73e8;
-            --primary-light: #e8f0fe;
-            --success: #0f9d58;
-            --danger: #d93025;
-            --warning: #f9ab00;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text: #202124;
-            --text-secondary: #5f6368;
-            --border: #dadce0;
-            --radius: 12px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --primary: #1a73e8; --primary-light: #e8f0fe; --success: #0f9d58;
+            --danger: #d93025; --warning: #f9ab00; --bg: #f8f9fa;
+            --card-bg: #ffffff; --text: #202124; --text-secondary: #5f6368;
+            --border: #dadce0; --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            padding: 20px;
+            background: var(--bg); color: var(--text); line-height: 1.6;
         }
-
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-        }
-
-        /* Header */
+        .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
         .header {
-            text-align: center;
-            padding: 30px 20px;
+            text-align: center; padding: 28px 20px;
             background: linear-gradient(135deg, #1a73e8 0%, #4285f4 50%, #5a95f5 100%);
-            color: white;
-            border-radius: var(--radius);
-            margin-bottom: 24px;
+            color: white; border-radius: var(--radius); margin-bottom: 0;
             box-shadow: var(--shadow);
         }
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-        .header .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        .header .update-time {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 8px;
-        }
+        .header h1 { font-size: 26px; margin-bottom: 4px; }
+        .header .subtitle { font-size: 13px; opacity: 0.85; }
 
-        /* Section Cards */
-        .section {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
+        /* Tabs */
+        .tabs {
+            display: flex; flex-wrap: wrap; gap: 4px;
+            background: var(--card-bg); padding: 8px 12px;
+            border-radius: 0 0 var(--radius) var(--radius);
+            box-shadow: var(--shadow); margin-bottom: 20px;
+            border-top: 2px solid var(--primary-light);
         }
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text);
-            border-bottom: 2px solid var(--primary-light);
-            padding-bottom: 12px;
+        .tab {
+            padding: 8px 14px; border: none; background: transparent;
+            border-radius: 8px; cursor: pointer; font-size: 14px;
+            color: var(--text-secondary); transition: all 0.2s;
+            font-family: inherit;
         }
-        .section-title .emoji { font-size: 24px; }
+        .tab:hover { background: var(--primary-light); color: var(--primary); }
+        .tab.active { background: var(--primary); color: white; font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg); border-radius: var(--radius);
+            padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
+        }
+        .card h2 {
+            font-size: 18px; font-weight: 600; margin-bottom: 14px;
+            border-bottom: 2px solid var(--primary-light); padding-bottom: 10px;
+        }
 
         /* Exchange Rate */
+        .rate-display { text-align: center; margin-bottom: 16px; }
+        .rate-value { font-size: 42px; font-weight: 700; color: var(--primary); }
+        .rate-change { font-size: 18px; margin-left: 12px; font-weight: 600; }
+        .rate-change.up { color: var(--success); }
+        .rate-change.down { color: var(--danger); }
         .rate-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px; margin-bottom: 16px;
         }
         .rate-item {
-            background: var(--primary-light);
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
+            background: var(--primary-light); border-radius: 8px;
+            padding: 10px; text-align: center;
         }
-        .rate-item .pair {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        .rate-item .value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .rate-item .highlight {
-            font-size: 28px;
-            color: var(--danger);
-        }
+        .rate-item .pair { font-size: 11px; color: var(--text-secondary); }
+        .rate-item .val { font-size: 20px; font-weight: 700; color: var(--primary); }
 
-        /* Oil Price */
-        .oil-main {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
+        .chart { height: 360px; width: 100%; }
+
+        /* Oil Summary */
+        .oil-summary {
+            display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;
         }
-        .oil-price {
-            font-size: 36px;
-            font-weight: 700;
-        }
-        .oil-change {
-            font-size: 18px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        .oil-change.up {
-            background: #e6f4ea;
-            color: var(--success);
-        }
-        .oil-change.down {
-            background: #fce8e6;
-            color: var(--danger);
-        }
-        .oil-detail {
-            color: var(--text-secondary);
+        .oil-summary span {
+            background: var(--bg); padding: 8px 14px; border-radius: 8px;
             font-size: 14px;
         }
-        .oil-history {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
+        .oil-summary strong { font-size: 18px; color: var(--primary); }
+
+        /* News List */
+        .news-list { display: flex; flex-direction: column; gap: 10px; }
+        .news-item {
+            padding: 10px 12px; background: var(--bg); border-radius: 8px;
+            border-left: 3px solid var(--primary);
         }
-        .oil-history h4 {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
+        .news-rank {
+            display: inline-block; width: 24px; height: 24px;
+            background: var(--primary); color: white; border-radius: 50%;
+            text-align: center; line-height: 24px; font-size: 12px; font-weight: 700;
+            margin-right: 8px; float: left;
         }
-        .oil-history table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
+        .news-item a {
+            color: var(--text); text-decoration: none; font-weight: 500;
+            display: block; margin-left: 32px;
         }
-        .oil-history td {
-            padding: 4px 8px;
+        .news-item a:hover { color: var(--primary); }
+        .news-meta { font-size: 12px; color: var(--text-secondary); margin-left: 32px; }
+        .news-desc { font-size: 13px; color: var(--text-secondary); margin: 4px 0 0 32px; }
+
+        /* Rank List (simple ordered) */
+        .rank-list { list-style: none; counter-reset: rank; }
+        .rank-list li {
+            counter-increment: rank; padding: 8px 12px;
+            border-bottom: 1px solid var(--border); font-size: 14px;
         }
-        .oil-history td:last-child {
-            text-align: right;
-            font-weight: 600;
+        .rank-list li::before {
+            content: counter(rank); display: inline-block; width: 22px; height: 22px;
+            background: var(--primary-light); color: var(--primary); border-radius: 50%;
+            text-align: center; line-height: 22px; font-size: 12px; font-weight: 700;
+            margin-right: 10px;
         }
 
         /* Slang */
-        .slang-list {
-            list-style: none;
-        }
+        .slang-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
         .slang-item {
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
+            padding: 12px; background: var(--bg); border-radius: 8px;
+            border-top: 3px solid var(--primary);
         }
-        .slang-item:last-child {
-            border-bottom: none;
-        }
-        .slang-word {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .slang-meaning {
-            margin: 6px 0;
-            color: var(--text);
-        }
-        .slang-example {
-            color: var(--text-secondary);
-            font-style: italic;
-            font-size: 14px;
-        }
-        .slang-example::before {
-            content: "💬 ";
-        }
-        .slang-source {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
+        .slang-word { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .slang-meaning { font-size: 13px; margin: 4px 0; }
+        .slang-example { font-size: 12px; color: var(--text-secondary); font-style: italic; }
+
+        .no-data { color: var(--text-secondary); text-align: center; padding: 40px; }
+
+        /* Company news special */
+        .company-tag {
+            display: inline-block; background: var(--primary-light); color: var(--primary);
+            padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 6px;
         }
 
-        /* Weather */
-        .weather-state {
-            margin-bottom: 20px;
-        }
-        .weather-state:last-child {
-            margin-bottom: 0;
-        }
-        .weather-state-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--text);
-        }
-        .weather-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 8px;
-        }
-        .weather-day {
-            background: var(--bg);
-            border-radius: 10px;
-            padding: 12px 8px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .weather-day:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .weather-day .day-name {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-        .weather-day .day-icon {
-            font-size: 28px;
-            margin: 4px 0;
-        }
-        .weather-day .day-temp {
-            font-size: 18px;
-            font-weight: 700;
-        }
-        .weather-day .day-forecast {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        /* Footer */
         .footer {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-secondary);
+            text-align: center; padding: 20px; color: var(--text-secondary);
             font-size: 13px;
         }
-        .footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
 
-        /* Responsive */
         @media (max-width: 600px) {
-            body { padding: 12px; }
-            .header h1 { font-size: 22px; }
-            .section { padding: 16px; }
-            .oil-price { font-size: 28px; }
-            .rate-grid { grid-template-columns: repeat(2, 1fr); }
-            .weather-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 400px) {
-            .rate-grid { grid-template-columns: 1fr 1fr; }
-            .weather-grid { grid-template-columns: repeat(3, 1fr); }
+            .container { padding: 10px; }
+            .header h1 { font-size: 20px; }
+            .rate-value { font-size: 32px; }
+            .rate-grid { grid-template-columns: repeat(3, 1fr); }
+            .tabs { gap: 2px; }
+            .tab { padding: 6px 10px; font-size: 12px; }
+            .slang-list { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🇺🇸 美国每日资讯日报</h1>
-            <div class="subtitle">📆 {{update_date}}</div>
-            <div class="update-time">数据更新时间：{{data_time}} UTC</div>
-        </div>
+<div class="container">
+    <header class="header">
+        <h1>🇺🇸 美国每日资讯日报</h1>
+        <div class="subtitle">{{update_date}} · 数据更新: {{data_time}}</div>
+    </header>
 
-        <!-- Exchange Rate -->
-        <div class="section">
-            <div class="section-title">
-                <span class="emoji">💱</span> 美元汇率
+    <nav class="tabs" id="tabNav">
+        <button class="tab active" data-tab="finance">💰 金融</button>
+        <button class="tab" data-tab="temperature">🌡️ 温度</button>
+        <button class="tab" data-tab="social">📱 社交</button>
+        <button class="tab" data-tab="news">📰 新闻</button>
+        <button class="tab" data-tab="products">🛒 热销</button>
+        <button class="tab" data-tab="ope">🌿 OPE</button>
+        <button class="tab" data-tab="warehouse">📦 海外仓</button>
+        <button class="tab" data-tab="ecpolicy">🏪 电商政策</button>
+        <button class="tab" data-tab="tariff">🛃 关税</button>
+        <button class="tab" data-tab="companies">🏢 企业</button>
+    </nav>
+
+    <!-- ===== TAB 1: 金融 ===== -->
+    <div class="tab-content active" id="tab-finance">
+        <div class="card">
+            <h2>💱 美元/人民币汇率</h2>
+            <div class="rate-display">
+                <span class="rate-value">${{USD_CNY}}</span>
+                <span class="rate-change {{rate_change_class}}">{{rate_change_icon}} {{rate_change}}</span>
             </div>
             <div class="rate-grid">
-                <div class="rate-item">
-                    <div class="pair">USD/CNY</div>
-                    <div class="value highlight">{{USD_CNY}}</div>
-                    <div class="pair">人民币</div>
-                </div>
-                <div class="rate-item">
-                    <div class="pair">USD/EUR</div>
-                    <div class="value">{{USD_EUR}}</div>
-                    <div class="pair">欧元</div>
-                </div>
-                <div class="rate-item">
-                    <div class="pair">USD/JPY</div>
-                    <div class="value">{{USD_JPY}}</div>
-                    <div class="pair">日元</div>
-                </div>
-                <div class="rate-item">
-                    <div class="pair">USD/GBP</div>
-                    <div class="value">{{USD_GBP}}</div>
-                    <div class="pair">英镑</div>
-                </div>
-                <div class="rate-item">
-                    <div class="pair">USD/CAD</div>
-                    <div class="value">{{USD_CAD}}</div>
-                    <div class="pair">加元</div>
-                </div>
-                <div class="rate-item">
-                    <div class="pair">USD/AUD</div>
-                    <div class="value">{{USD_AUD}}</div>
-                    <div class="pair">澳元</div>
-                </div>
+                <div class="rate-item"><div class="pair">USD/EUR</div><div class="val">{{USD_EUR}}</div></div>
+                <div class="rate-item"><div class="pair">USD/JPY</div><div class="val">{{USD_JPY}}</div></div>
+                <div class="rate-item"><div class="pair">USD/GBP</div><div class="val">{{USD_GBP}}</div></div>
+                <div class="rate-item"><div class="pair">USD/CAD</div><div class="val">{{USD_CAD}}</div></div>
+                <div class="rate-item"><div class="pair">USD/AUD</div><div class="val">{{USD_AUD}}</div></div>
+                <div class="rate-item"><div class="pair">USD/CHF</div><div class="val">{{USD_CHF}}</div></div>
             </div>
+            <div id="chart-exchange" class="chart"></div>
         </div>
-
-        <!-- Oil Price -->
-        <div class="section">
-            <div class="section-title">
-                <span class="emoji">🛢️</span> 美国油价趋势
+        <div class="card">
+            <h2>🛢️ 原油 & 汽油价格</h2>
+            <div class="oil-summary">
+                <span>WTI 原油: <strong>${{crude_price}}</strong></span>
+                <span>Regular: <strong>${{gas_regular}}</strong></span>
+                <span>Premium: <strong>${{gas_premium}}</strong></span>
+                <span>Diesel: <strong>${{gas_diesel}}</strong></span>
             </div>
-            <div class="oil-main">
-                <div>
-                    <div class="oil-price">${{oil_current}}</div>
-                    <div class="oil-detail">{{oil_unit}}</div>
-                </div>
-                <div>
-                    <span class="oil-change {{oil_change_class}}">{{oil_change_icon}} {{oil_change_str}}</span>
-                </div>
-                <div class="oil-detail">
-                    昨收: ${{oil_close}}
-                </div>
-            </div>
-            {{oil_history_html}}
-        </div>
-
-        <!-- Slang -->
-        <div class="section">
-            <div class="section-title">
-                <span class="emoji">🗣️</span> 美国俚语 & 网络流行语
-            </div>
-            <ul class="slang-list">
-                {{slang_items_html}}
-            </ul>
-        </div>
-
-        <!-- Weather -->
-        <div class="section">
-            <div class="section-title">
-                <span class="emoji">🌤️</span> 美国各州一周天气
-            </div>
-            {{weather_html}}
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>📡 数据来源：open.er-api.com | Yahoo Finance | Urban Dictionary | Reddit | National Weather Service</p>
-            <p>⚡ 每日 9:00 自动更新 · <a href="https://github.com/{{github_repo}}" target="_blank" rel="noopener">GitHub 项目地址</a></p>
-            <p>🤖 由 GitHub Actions 自动生成 · {{update_date}}</p>
+            <div id="chart-oil" class="chart"></div>
         </div>
     </div>
+
+    <!-- ===== TAB 2: 温度 ===== -->
+    <div class="tab-content" id="tab-temperature">
+        <div class="card">
+            <h2>🌡️ 美国各州实时温度 (°F)</h2>
+            <div id="chart-temp-map" class="chart" style="height:600px;"></div>
+        </div>
+    </div>
+
+    <!-- ===== TAB 3: 社交 ===== -->
+    <div class="tab-content" id="tab-social">
+        {{tab_social_html}}
+    </div>
+
+    <!-- ===== TAB 4: 新闻 ===== -->
+    <div class="tab-content" id="tab-news">
+        {{tab_news_html}}
+    </div>
+
+    <!-- ===== TAB 5: 热销 ===== -->
+    <div class="tab-content" id="tab-products">
+        {{tab_products_html}}
+    </div>
+
+    <!-- ===== TAB 6: OPE ===== -->
+    <div class="tab-content" id="tab-ope">
+        {{tab_ope_html}}
+    </div>
+
+    <!-- ===== TAB 7: 海外仓 ===== -->
+    <div class="tab-content" id="tab-warehouse">
+        {{tab_warehouse_html}}
+    </div>
+
+    <!-- ===== TAB 8: 电商政策 ===== -->
+    <div class="tab-content" id="tab-ecpolicy">
+        {{tab_ecpolicy_html}}
+    </div>
+
+    <!-- ===== TAB 9: 关税 ===== -->
+    <div class="tab-content" id="tab-tariff">
+        {{tab_tariff_html}}
+    </div>
+
+    <!-- ===== TAB 10: 企业 ===== -->
+    <div class="tab-content" id="tab-companies">
+        {{tab_companies_html}}
+    </div>
+
+    <footer class="footer">
+        <p>📡 数据来源: open.er-api.com · frankfurter.app · Yahoo Finance · EIA · NWS · Google Trends · Reddit · NewsAPI · RSS · 网页爬虫</p>
+        <p>⚡ 每日 9:00 自动更新 · <a href="https://github.com/manbeauty/us-daily-digest" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        this.classList.add('active');
+        var target = document.getElementById('tab-' + this.dataset.tab);
+        if (target) target.classList.add('active');
+        setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 150);
+    });
+});
+
+// Initialize charts
+{{exchange_chart_script}}
+{{oil_chart_script}}
+{{temp_map_script}}
+</script>
 </body>
 </html>
