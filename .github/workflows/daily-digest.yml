@@ -1,23 +1,15 @@
-# 🇺🇸 美国每日资讯日报 - GitHub Actions 工作流
-# 每天早上 9:00 (北京时间 = UTC 1:00) 自动运行
-# 生成 HTML 日报并部署到 GitHub Pages
-
-name: 🇺🇸 每日资讯日报
+name: 🇺🇸 每日资讯日报 V2
 
 on:
   schedule:
-    # 每天 UTC 1:00 = 北京时间 9:00
     - cron: '0 1 * * *'
-  # 支持手动触发（方便测试）
   workflow_dispatch:
 
-# 设置 GITHUB_TOKEN 的权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 并发控制：同一时间只运行一个部署
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -30,29 +22,37 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: 📥 检出代码
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 🐍 设置 Python
+      - name: Cache data directory
+        uses: actions/cache@v3
+        with:
+          path: data/
+          key: us-daily-data-${{ github.run_id }}
+          restore-keys: us-daily-data-
+
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: 📦 安装依赖
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt || echo "无外部依赖"
+          pip install -r requirements.txt
 
-      - name: 📡 运行日报生成器
+      - name: Run daily digest generator
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
         run: python src/main.py
 
-      - name: 📤 上传 Pages 制品
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 上传生成的 output 目录
           path: './output'
 
-      - name: 🚀 部署到 GitHub Pages
+      - name: Deploy to Pages
         id: deployment
         uses: actions/deploy-pages@v4
