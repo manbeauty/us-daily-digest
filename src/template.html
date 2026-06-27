@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇺🇸 美国每日资讯日报 - {{update_date}}</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-light: #e8f0fe;
+            --success: #0f9d58;
+            --danger: #d93025;
+            --warning: #f9ab00;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #1a73e8 0%, #4285f4 50%, #5a95f5 100%);
+            color: white;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .header .update-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 8px;
+        }
+
+        /* Section Cards */
+        .section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 12px;
+        }
+        .section-title .emoji { font-size: 24px; }
+
+        /* Exchange Rate */
+        .rate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .rate-item {
+            background: var(--primary-light);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .rate-item .pair {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .rate-item .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .rate-item .highlight {
+            font-size: 28px;
+            color: var(--danger);
+        }
+
+        /* Oil Price */
+        .oil-main {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .oil-price {
+            font-size: 36px;
+            font-weight: 700;
+        }
+        .oil-change {
+            font-size: 18px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .oil-change.up {
+            background: #e6f4ea;
+            color: var(--success);
+        }
+        .oil-change.down {
+            background: #fce8e6;
+            color: var(--danger);
+        }
+        .oil-detail {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .oil-history {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .oil-history h4 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .oil-history table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .oil-history td {
+            padding: 4px 8px;
+        }
+        .oil-history td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        /* Slang */
+        .slang-list {
+            list-style: none;
+        }
+        .slang-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .slang-item:last-child {
+            border-bottom: none;
+        }
+        .slang-word {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .slang-meaning {
+            margin: 6px 0;
+            color: var(--text);
+        }
+        .slang-example {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 14px;
+        }
+        .slang-example::before {
+            content: "💬 ";
+        }
+        .slang-source {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Weather */
+        .weather-state {
+            margin-bottom: 20px;
+        }
+        .weather-state:last-child {
+            margin-bottom: 0;
+        }
+        .weather-state-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 8px;
+        }
+        .weather-day {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .weather-day:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .weather-day .day-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .weather-day .day-icon {
+            font-size: 28px;
+            margin: 4px 0;
+        }
+        .weather-day .day-temp {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .weather-day .day-forecast {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .header h1 { font-size: 22px; }
+            .section { padding: 16px; }
+            .oil-price { font-size: 28px; }
+            .rate-grid { grid-template-columns: repeat(2, 1fr); }
+            .weather-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 400px) {
+            .rate-grid { grid-template-columns: 1fr 1fr; }
+            .weather-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🇺🇸 美国每日资讯日报</h1>
+            <div class="subtitle">📆 {{update_date}}</div>
+            <div class="update-time">数据更新时间：{{data_time}} UTC</div>
+        </div>
+
+        <!-- Exchange Rate -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">💱</span> 美元汇率
+            </div>
+            <div class="rate-grid">
+                <div class="rate-item">
+                    <div class="pair">USD/CNY</div>
+                    <div class="value highlight">{{USD_CNY}}</div>
+                    <div class="pair">人民币</div>
+                </div>
+                <div class="rate-item">
+                    <div class="pair">USD/EUR</div>
+                    <div class="value">{{USD_EUR}}</div>
+                    <div class="pair">欧元</div>
+                </div>
+                <div class="rate-item">
+                    <div class="pair">USD/JPY</div>
+                    <div class="value">{{USD_JPY}}</div>
+                    <div class="pair">日元</div>
+                </div>
+                <div class="rate-item">
+                    <div class="pair">USD/GBP</div>
+                    <div class="value">{{USD_GBP}}</div>
+                    <div class="pair">英镑</div>
+                </div>
+                <div class="rate-item">
+                    <div class="pair">USD/CAD</div>
+                    <div class="value">{{USD_CAD}}</div>
+                    <div class="pair">加元</div>
+                </div>
+                <div class="rate-item">
+                    <div class="pair">USD/AUD</div>
+                    <div class="value">{{USD_AUD}}</div>
+                    <div class="pair">澳元</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Oil Price -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🛢️</span> 美国油价趋势
+            </div>
+            <div class="oil-main">
+                <div>
+                    <div class="oil-price">${{oil_current}}</div>
+                    <div class="oil-detail">{{oil_unit}}</div>
+                </div>
+                <div>
+                    <span class="oil-change {{oil_change_class}}">{{oil_change_icon}} {{oil_change_str}}</span>
+                </div>
+                <div class="oil-detail">
+                    昨收: ${{oil_close}}
+                </div>
+            </div>
+            {{oil_history_html}}
+        </div>
+
+        <!-- Slang -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🗣️</span> 美国俚语 & 网络流行语
+            </div>
+            <ul class="slang-list">
+                {{slang_items_html}}
+            </ul>
+        </div>
+
+        <!-- Weather -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🌤️</span> 美国各州一周天气
+            </div>
+            {{weather_html}}
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>📡 数据来源：open.er-api.com | Yahoo Finance | Urban Dictionary | Reddit | National Weather Service</p>
+            <p>⚡ 每日 9:00 自动更新 · <a href="https://github.com/{{github_repo}}" target="_blank" rel="noopener">GitHub 项目地址</a></p>
+            <p>🤖 由 GitHub Actions 自动生成 · {{update_date}}</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+{
+  "states": [
+    {
+      "rank": 1,
+      "name": "California",
+      "name_cn": "加利福尼亚州",
+      "abbr": "CA",
+      "capital": "Sacramento",
+      "capital_cn": "萨克拉门托",
+      "latitude": 38.5816,
+      "longitude": -121.4944
+    },
+    {
+      "rank": 2,
+      "name": "Texas",
+      "name_cn": "德克萨斯州",
+      "abbr": "TX",
+      "capital": "Austin",
+      "capital_cn": "奥斯汀",
+      "latitude": 30.2672,
+      "longitude": -97.7431
+    },
+    {
+      "rank": 3,
+      "name": "Florida",
+      "name_cn": "佛罗里达州",
+      "abbr": "FL",
+      "capital": "Tallahassee",
+      "capital_cn": "塔拉哈西",
+      "latitude": 30.4383,
+      "longitude": -84.2807
+    },
+    {
+      "rank": 4,
+      "name": "New York",
+      "name_cn": "纽约州",
+      "abbr": "NY",
+      "capital": "Albany",
+      "capital_cn": "奥尔巴尼",
+      "latitude": 42.6526,
+      "longitude": -73.7562
+    },
+    {
+      "rank": 5,
+      "name": "Illinois",
+      "name_cn": "伊利诺伊州",
+      "abbr": "IL",
+      "capital": "Springfield",
+      "capital_cn": "斯普林菲尔德",
+      "latitude": 39.7817,
+      "longitude": -89.6501
+    },
+    {
+      "rank": 6,
+      "name": "Pennsylvania",
+      "name_cn": "宾夕法尼亚州",
+      "abbr": "PA",
+      "capital": "Harrisburg",
+      "capital_cn": "哈里斯堡",
+      "latitude": 40.2732,
+      "longitude": -76.8867
+    },
+    {
+      "rank": 7,
+      "name": "Ohio",
+      "name_cn": "俄亥俄州",
+      "abbr": "OH",
+      "capital": "Columbus",
+      "capital_cn": "哥伦布",
+      "latitude": 39.9612,
+      "longitude": -82.9988
+    },
+    {
+      "rank": 8,
+      "name": "Georgia",
+      "name_cn": "佐治亚州",
+      "abbr": "GA",
+      "capital": "Atlanta",
+      "capital_cn": "亚特兰大",
+      "latitude": 33.7490,
+      "longitude": -84.3880
+    },
+    {
+      "rank": 9,
+      "name": "North Carolina",
+      "name_cn": "北卡罗来纳州",
+      "abbr": "NC",
+      "capital": "Raleigh",
+      "capital_cn": "罗利",
+      "latitude": 35.7796,
+      "longitude": -78.6382
+    },
+    {
+      "rank": 10,
+      "name": "Michigan",
+      "name_cn": "密歇根州",
+      "abbr": "MI",
+      "capital": "Lansing",
+      "capital_cn": "兰辛",
+      "latitude": 42.7325,
+      "longitude": -84.5555
+    }
+  ]
+}
